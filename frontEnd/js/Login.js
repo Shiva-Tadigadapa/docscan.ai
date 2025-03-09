@@ -4,6 +4,8 @@ import { checkAuthStatus } from './routeGuard.js';
 const API_URL = "https://docscan-ai.onrender.com/api/auth";
 
 
+
+
 checkAuthStatus();
 async function loginUser(email, password) {
     try {
