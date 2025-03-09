@@ -21,8 +21,8 @@ require("./migrations/initDB.js");
 
 // Middleware
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: ['http://localhost:5173', 'https://docscan-ai.vercel.app/','http://127.0.0.1:5500/'],
+  credentials: true 
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
