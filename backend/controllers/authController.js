@@ -1,14 +1,14 @@
-import { findUserByEmail, createUser } from "../models/userModel";
-import { genSalt, hash, compare } from "bcrypt";
-import { sign, verify } from "jsonwebtoken";
-import { isAdmin, getAdminDetails } from "../models/adminModel";
-import { prepare } from "../config/db"; // Add this line to import the db
+const UserModel = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const AdminModel = require("../models/adminModel");
+const db = require("../config/db"); // Add this line to import the db
 
 // Load environment variables
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "your_access_token_secret";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
 
-export async function register(req, res) {
+exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -18,27 +18,27 @@ export async function register(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = findUserByEmail(email);
+    const existingUser = UserModel.findUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: "User already exists" });
     }
 
     // Hash password
-    const salt = await genSalt(12);
-    const hashedPassword = await hash(password, salt);
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create user
-    const result = createUser(name, email, hashedPassword);
+    const result = UserModel.createUser(name, email, hashedPassword);
     const userId = result.lastInsertRowid;
     
     // Generate tokens
-    const accessToken = sign(
+    const accessToken = jwt.sign(
       { userId, email, role: "user" },
       ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" }
     );
     
-    const refreshToken = sign(
+    const refreshToken = jwt.sign(
       { userId, email, role: "user" },
       REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
@@ -48,10 +48,10 @@ export async function register(req, res) {
     storeRefreshToken(userId, refreshToken);
     
     // Initialize user role
-    prepare("INSERT INTO user_roles (user_id, role) VALUES (?, ?)").run(userId, "user");
+    db.prepare("INSERT INTO user_roles (user_id, role) VALUES (?, ?)").run(userId, "user");
     
     // Initialize user credits
-    prepare("INSERT INTO user_credits (user_id, credits) VALUES (?, ?)").run(userId, 20);
+    db.prepare("INSERT INTO user_credits (user_id, credits) VALUES (?, ?)").run(userId, 20);
 
     // Set refresh token in http-only cookie
     res.cookie("refreshToken", refreshToken, {
@@ -70,11 +70,11 @@ export async function register(req, res) {
     console.error("Registration error:", error);
     res.status(500).json({ error: "Server error" });
   }
-}
+};
 
  
 
-export async function login(req, res) {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("Login request received",email,password)
@@ -85,12 +85,12 @@ export async function login(req, res) {
     }
 
     // First check if it's an admin email
-    const isUserAdmin = await isAdmin(email);
+    const isUserAdmin = await AdminModel.isAdmin(email);
     console.log("isUserAdmin",isUserAdmin)
 
     if (isUserAdmin) {
       // Admin authentication flow
-      const adminDetails = getAdminDetails(email);
+      const adminDetails = AdminModel.getAdminDetails(email);
       if (!adminDetails) {
         return res.status(401).json({ error: "Invalid admin credentials" });
       }
@@ -102,8 +102,8 @@ export async function login(req, res) {
         adminId: adminDetails.id
       };
 
-      const accessToken = sign(tokenPayload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-      const refreshToken = sign(tokenPayload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+      const accessToken = jwt.sign(tokenPayload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+      const refreshToken = jwt.sign(tokenPayload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 
       // Store refresh token and set cookie
       storeRefreshToken(adminDetails.id, refreshToken);
@@ -128,13 +128,13 @@ export async function login(req, res) {
 
     } else {
       // Regular user authentication flow
-      const user = findUserByEmail(email);
+      const user = UserModel.findUserByEmail(email);
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
       // Verify password for regular users
-      const isPasswordValid = await compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
@@ -145,8 +145,8 @@ export async function login(req, res) {
         role: 'user'
       };
 
-      const accessToken = sign(tokenPayload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-      const refreshToken = sign(tokenPayload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+      const accessToken = jwt.sign(tokenPayload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+      const refreshToken = jwt.sign(tokenPayload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 
       // Store refresh token and set cookie
       storeRefreshToken(user.id, refreshToken);
@@ -173,11 +173,11 @@ export async function login(req, res) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Server error" });
   }
-}
+};
 
  
 
-export function refreshToken(req, res) {
+exports.refreshToken = (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -186,7 +186,7 @@ export function refreshToken(req, res) {
 
   try {
     // Verify refresh token
-    const decoded = verify(refreshToken, REFRESH_TOKEN_SECRET);
+    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
     
     // Check if token exists in database
     const storedToken = findRefreshToken(decoded.userId, refreshToken);
@@ -195,7 +195,7 @@ export function refreshToken(req, res) {
     }
 
     // Generate new access token
-    const accessToken = sign(
+    const accessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email, role: decoded.role },
       ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" }
@@ -206,15 +206,15 @@ export function refreshToken(req, res) {
     console.error("Token refresh error:", error);
     res.status(403).json({ error: "Invalid refresh token" });
   }
-}
+};
 
-export function logout(req, res) {
+exports.logout = (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   
   if (refreshToken) {
     try {
       // Verify token to get userId
-      const decoded = verify(refreshToken, REFRESH_TOKEN_SECRET);
+      const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
       
       // Remove refresh token from database
       removeRefreshToken(decoded.userId, refreshToken);
@@ -227,12 +227,12 @@ export function logout(req, res) {
   // Clear refresh token cookie
   res.clearCookie("refreshToken");
   res.json({ message: "Logged out successfully" });
-}
+};
 
 // Helper functions for refresh token management
 function storeRefreshToken(userId, token) {
   try {
-    const stmt = prepare(
+    const stmt = db.prepare(
       "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, datetime('now', '+7 days'))"
     );
     stmt.run(userId, token);
@@ -244,7 +244,7 @@ function storeRefreshToken(userId, token) {
 
 function findRefreshToken(userId, token) {
   try {
-    const stmt = prepare(
+    const stmt = db.prepare(
       "SELECT * FROM refresh_tokens WHERE user_id = ? AND token = ? AND expires_at > datetime('now')"
     );
     return stmt.get(userId, token);
@@ -256,7 +256,7 @@ function findRefreshToken(userId, token) {
 
 function removeRefreshToken(userId, token) {
   try {
-    const stmt = prepare(
+    const stmt = db.prepare(
       "DELETE FROM refresh_tokens WHERE user_id = ? AND token = ?"
     );
     stmt.run(userId, token);
