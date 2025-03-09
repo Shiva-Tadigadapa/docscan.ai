@@ -2,22 +2,22 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const db = require("../backend/config/db.js");
+const db = require("./config/db.js");
 const app = express();
 
 // Ensure DB initializes on startup
-require('../backend/config/db.js'); 
+require('./config/db.js'); 
 require("dotenv").config();
 
 // Import routes
-const scanRoutes = require("../backend/routes/scanRoutes.js");
-const authRoutes = require("../backend/routes/authRoutes.js");
-const creditRoutes = require("../backend/routes/creditRoutes.js");
-const adminRoutes = require("../backend/routes/adminRoutes.js"); // Add admin routes
-const creditRequestRoutes = require("../backend/routes/creditRequestRoute.js");
-const creditResetRoutes = require('../backend/routes/creditResetRoutes.js');
+const scanRoutes = require("./routes/scanRoutes.js");
+const authRoutes = require("./routes/authRoutes.js");
+const creditRoutes = require("./routes/creditRoutes.js");
+const adminRoutes = require("./routes/adminRoutes.js"); // Add admin routes
+const creditRequestRoutes = require("./routes/creditRequestRoute.js");
+const creditResetRoutes = require('./routes/creditResetRoutes.js');
 // Initialize database
-require("../backend/migrations/initDB.js");
+require("./migrations/initDB.js");
 
 // Middleware
 app.use(cors({
@@ -50,4 +50,4 @@ app.listen(3000, () => {
 
 
 
-module.exports = app;
+// module.exports = app;
