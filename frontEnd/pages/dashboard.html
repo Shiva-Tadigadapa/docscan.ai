@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocScan - Document Scanning System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    :root {
+      --sidebar-bg: #f5f5f7;
+      --main-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #777777;
+      --border-color: #e0e0e0;
+      --accent-color: #000000;
+      --hover-bg: #eaeaea;
+      --success-color: #000000;
+      --warning-color: #000000;
+      --danger-color: #000000;
+    }
+    
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+    
+ 
+     
+    .sidebar {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      padding: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    
+    .app-title {
+      display: flex;
+      align-items: center;
+      padding: 0 16px 20px;
+      font-weight: 600;
+    }
+    
+    .app-icon {
+      width: 24px;
+      height: 24px;
+      background-color: var(--accent-color);
+      border-radius: 6px;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    
+    .toggle {
+      width: 32px;
+      height: 18px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      margin-left: auto;
+      position: relative;
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background-color: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+       border-radius: 10px;
+       width: 90%;
+      margin: 0 auto;
+       margin-top: 2px;
+    }
+    
+    .nav-item:hover {
+        /* padding: 1; */
+      background-color: var(--hover-bg);
+    }
+    
+    .nav-item.active {
+      background-color: var(--hover-bg);
+    }
+    
+    .nav-icon {
+      color: var(--text-secondary);
+      margin-right: 10px;
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .section-header {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 16px 16px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .credit-info {
+      padding: 16px;
+      margin-top: auto !important;
+        width: 92%;
+        white-space: nowrap;
+      margin: 0 auto;
+      border-radius: 16px;
+      background-color: white;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .credit-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .credit-bar {
+      height: 8px;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    
+    .credit-used {
+      height: 100%;
+      width: 60%;
+      background-color: var(--accent-color);
+      border-radius: 4px;
+    }
+    
+    .credit-text {
+      font-size: 10px;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .request-btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      border: none;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+    }
+    
+    .request-btn:hover {
+      opacity: 0.9;
+    }
+    
+    .main-content {
+      flex: 1;
+      background-color: var(--main-bg);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 16px 0 24px;
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .card {
+      background-color: var(--main-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        background-color: #eeeeee;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+    
+    .scan-icon {
+      background-color: var(--accent-color);
+    }
+    
+    .history-icon {
+      background-color: var(--warning-color);
+    }
+    
+    .analytics-icon {
+      background-color: var(--success-color);
+    }
+    
+    .credits-icon {
+      background-color: #000000;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .tab {
+      padding: 8px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      background-color: var(--hover-bg);
+      font-weight: 500;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-left: auto;
+    }
+    
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+    
+    .search-input {
+      padding: 8px 8px 8px 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      outline: none;
+      font-size: 14px;
+      width: 200px;
+    }
+    
+    .document-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .document-list th {
+      text-align: left;
+      padding: 12px 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: normal;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .document-list td {
+      padding: 12px 8px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .doc-checkbox {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    .doc-checkbox:checked {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    
+    .doc-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+    
+    .doc-name {
+      font-weight: 500;
+    }
+    
+    .doc-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-badge.match {
+      background-color: rgba(52, 199, 89, 0.1);
+      color: var(--success-color);
+    }
+    
+    .status-badge.partial {
+      background-color: rgba(255, 149, 0, 0.1);
+      color: var(--warning-color);
+    }
+    
+    .status-badge.no-match {
+      background-color: rgba(255, 59, 48, 0.1);
+      color: var(--danger-color);
+    }
+    
+    .doc-actions {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .doc-row:hover .doc-actions {
+      opacity: 1;
+    }
+    
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+    
+    .view-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+      gap: 8px;
+    }
+    
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      background-color: var(--main-bg);
+      cursor: pointer;
+    }
+    
+    .page-btn.active {
+      background-color: var(--hover-bg);
+      font-weight: 500;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background-color: var(--main-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .stat-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .stat-footer {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    
+    .upload-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    
+    .upload-zone:hover {
+      border-color: var(--accent-color);
+    }
+    
+    .upload-icon {
+      font-size: 32px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .upload-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .upload-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: var(--main-bg);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .form-textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .btn-cancel {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background-color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .btn-submit {
+      padding: 8px 16px;
+      border: none;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .chart-container {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    .chart {
+      height: 200px;
+      width: 100%;
+      /* background-color: var(--hover-bg); */
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding: 16px;
+    }
+    
+    .chart-bar {
+      flex: 1;
+      background-color: var(--accent-color);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+    
+    .chart-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    .chart-value {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .icon-nav{
+    width: 20px;
+    }
+  </style>
+</head>
+<body>
+  
+
+  <aside class="sidebar">
+    <div class="app-title">
+      <div class="app-icon">DS</div>
+      DocScan
+      <div class="toggle"></div>
+    </div>
+    
+    <a href="#" class="nav-item active">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//dashboard.png"/></span>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//scan.png"/></span>
+      Scan Document
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//file.png"/></span>
+      My Documents
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//search.png"/></span>
+      Previous Scans
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//match.png"/></span>
+      Match Results
+    </a>
+    
+    <div class="section-header">ADMIN</div>
+    
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><img class="icon-nav" src="..//icons//group.png"/></span>
+      User Management
+    </a>
+    <a href="#" class="nav-item">
+     
+        <span class="nav-icon"><img class="icon-nav" src="..//icons//credit.png"/></span>
+      Credit Requests
+    </a>
+    <a href="#" class="nav-item">
+        <span class="nav-icon"><img class="icon-nav" src="..//icons//ana.png"/></span>
+      Analytics
+    </a>
+    <a href="#" class="nav-item">
+        <span class="nav-icon"><img class="icon-nav" src="..//icons//setting.png"/></span>
+      Settings
+    </a>
+    
+    <div class="credit-info">
+      <div class="credit-label">
+        <span>Daily Credits</span>
+        <span>00/20</span>
+      </div>
+      <div class="credit-bar">
+        <div class="credit-used" style="width:0%"></div>
+      </div>
+      <div class="credit-text">
+        <span>00 credits remaining</span>
+        <span>Resets at midnight</span>
+      </div>
+      <a href="#" class="request-btn" id="requestCreditsBtn">Request More Credits</a>
+    </div>
+  </aside>
+  
+  <main class="main-content">
+    <div  style="display: flex; width: 100%; justify-content: space-between;">
+      <h1 class="page-title">Dashboard</h1>
+      <h1 class="page-title"><img style="width: 30px; cursor: pointer;" id="logout-button" src="../icons/logout.png" /></h1>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Today's Scans</div>
+        <div class="stat-value">00</div>
+        <div class="stat-footer">00 credits remaining</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Total Documents</div>
+        <div class="stat-value">47</div>
+        <div class="stat-footer">+5 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Match Rate</div>
+        <div class="stat-value">68%</div>
+        <div class="stat-footer">+12% from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Pending Requests</div>
+        <div class="stat-value">2</div>
+        <div class="stat-footer">Awaiting approval</div>
+      </div>
+    </div>
+    
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon scan-icon"> <img class="icon-nav" src="..//icons//document.png"/> </div>
+        <div class="card-title">Scan Document</div>
+        <div class="card-subtitle">Upload new file for scanning</div>
+      </div>
+      
+      <div class="card">
+        <div class="card-icon history-icon"> <img class="icon-nav" src="..//icons//scan (2).png"/></div>
+        <div class="card-title">Scan History</div>
+        <div class="card-subtitle">View previous scans</div>
+      </div>
+      
+      <div class="card">
+        <div class="card-icon analytics-icon"><img class="icon-nav" src="..//icons//bar.png"/></div>
+        <div class="card-title">Analytics</div>
+        <div class="card-subtitle">View usage statistics</div>
+      </div>
+      
+      <div class="card">
+        <div class="card-icon credits-icon"><img class="icon-nav" src="..//icons//token.png"/></div>
+        <div class="card-title">Credits</div>
+        <div class="card-subtitle">Manage credit balance</div>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-title">Scan Activity (Last 7 Days)</div>
+      <div class="chart">
+        <div class="chart-bar" style="height: 40%;">
+          <div class="chart-value">8</div>
+          <div class="chart-label">Mon</div>
+        </div>
+        <div class="chart-bar" style="height: 65%;">
+          <div class="chart-value">13</div>
+          <div class="chart-label">Tue</div>
+        </div>
+        <div class="chart-bar" style="height: 30%;">
+          <div class="chart-value">6</div>
+          <div class="chart-label">Wed</div>
+        </div>
+        <div class="chart-bar" style="height: 85%;">
+          <div class="chart-value">17</div>
+          <div class="chart-label">Thu</div>
+        </div>
+        <div class="chart-bar" style="height: 60%;">
+          <div class="chart-value">12</div>
+          <div class="chart-label">Fri</div>
+        </div>
+        <div class="chart-bar" style="height: 20%;">
+          <div class="chart-value">4</div>
+          <div class="chart-label">Sat</div>
+        </div>
+        <div class="chart-bar" style="height: 25%;">
+          <div class="chart-value">5</div>
+          <div class="chart-label">Sun</div>
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <div class="section-title">
+        Recent Scans
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="Search documents">
+        </div>
+      </div>
+      
+      <table class="document-list">
+        <thead>
+          <tr>
+            <th width="30"></th>
+            <th width="40"></th>
+            <th>Document Name</th>
+            <th>Scan Date</th>
+            <th>Status</th>
+            <th>Match Rate</th>
+            <th width="80">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="doc-row">
+            <td><input type="checkbox" class="doc-checkbox"></td>
+            <td>
+              <div class="doc-icon">📄</div>
+            </td>
+            <td>
+              <div class="doc-name">loading...</div>
+              <div class="doc-meta">00 KB · txt</div>
+            </td>
+            <td>loading...</td>
+            <td><span class="status-badge match">loading...</span></td>
+            <td>00%</td>
+            <td>
+              <button class="view-btn">loading...</button>
+            </td>
+          </tr>
+         
+        </tbody>
+      </table>
+      
+      <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Request Credits Modal -->
+  <div class="modal" id="requestCreditsModal">
+    <div class="modal-content">
+      <h2 class="modal-title">Request Additional Credits</h2>
+      <div class="form-group">
+        <label class="form-label">Number of Credits</label>
+        <input type="number" class="form-input" min="1" max="100" value="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason for Request</label>
+        <textarea class="form-textarea" placeholder="Please explain why you need additional credits..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" id="cancelCreditRequest">Cancel</button>
+        <button class="btn-submit">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Document Modal -->
+  <div class="modal" id="uploadDocumentModal">
+    <div class="modal-content">
+      <h2 class="modal-title">Upload Document for Scanning</h2>
+      <div class="upload-zone" id="dropZone">
+        <div class="upload-icon">📤</div>
+        <div class="upload-title">Drag & Drop or Click to Upload</div>
+        <div class="upload-subtitle">Only plain text (.txt) files are supported</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Document Name (Optional)</label>
+        <input type="text" class="form-input" placeholder="Enter a name for your document">
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" id="cancelUpload">Cancel</button>
+        <button class="btn-submit">Scan Document (1 Credit)</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/dashboard.js"></script>
+  <script>
+ 
+</script>
+
+
+</body>
+</html>

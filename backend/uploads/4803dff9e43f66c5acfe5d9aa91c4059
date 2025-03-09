@@ -1,0 +1,212 @@
+const expregle.com');
+    res.send("You are on localhost 3000");
+});
+
+const browserProcesses = {
+    chrome: null,
+    firefox: null
+};
+
+app.get("/start", (req, res) => {
+    const { browser, url } = req.query;
+    if (!browser || !url) return res.status(400).send("Browser and URL are required");
+
+    let command;
+    if (browser === "chrome") {
+        command = `open -a "Google Chrome" "${url}"`;
+    } else if (browser === "firefox") {
+        command = `open -a "Firefox" "${url}"`;
+    } else {
+        return res.status(400).send("Invalid browser");
+    }
+    function getChromeURL() {ss = require("express");
+const { exec, execSync } = require("child_process");
+const CDP = require('chrome-remote-interface');
+
+const app = express();
+async function getActiveTabUrl() {
+    let client;
+    try {ss = require("express");
+const { exec, execSync } = require("child_process");
+const CDP = require('chrome-remote-interface');
+
+const app = express();
+async function getActiveTabUrl() {
+    let client;
+    try {ss = require("express");
+const { exec, execSync } = require("child_process");
+const CDP = require('chrome-remote-interface');
+
+const app = express();
+async function getActiveTabUrl() {
+    let client;
+    try {
+
+        client = await CDP();
+        const { Page, Runtime } = client;
+        // await Page.enable();
+        const result = await Runtime.evaluate({ expression: "window.location.href" });
+        console.log("Active Tab URL:", resultss = require("express");
+const { exec, execSync } = require("child_process");
+const CDP = require('chrome-remote-interface');
+
+const app = express();
+async function getActiveTabUrl() {
+    let client;
+    try {
+
+        client = await CDP();
+        const { Page, Runtime } = client;
+        // await Page.enable();
+        const result = await Runtime.evaluate({ expression: "window.location.href" });
+        console.log("Active Tab URL:", result.result.value);
+    } catch (err) {
+        console.error("Error:", err);
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+// getActiveTabUrl();
+
+app.get("/", (req, res) => {
+    exec('open -a "Google Chrome" https://www.goo.result.value);
+    } catch (err) {
+        console.error("Error:", err);
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+// getActiveTabUrl();
+
+app.get("/", (req, res) => {
+    exec('open -a "Google Chrome" https://www.goo
+
+        client = await CDP();
+        const { Page, Runtime } = client;
+        // await Page.enable();
+        const result = await Runtime.evaluate({ expression: "window.location.href" });
+        console.log("Active Tab URL:", result.result.value);
+    } catch (err) {
+        console.error("Error:", err);
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+// getActiveTabUrl();
+
+app.get("/", (req, res) => {
+    exec('open -a "Google Chrome" https://www.goo
+
+        client = await CDP();
+        const { Page, Runtime } = client;
+        // await Page.enable();
+        const result = await Runtime.evaluate({ expression: "window.location.href" });
+        console.log("Active Tab URL:", result.result.value);
+    } catch (err) {
+        console.error("Error:", err);
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+// getActiveTabUrl();
+
+app.get("/", (req, res) => {
+    exec('open -a "Google Chrome" https://www.goo
+        return execSync(
+            `osascript -e 'tell application "Google Chrome" to get URL of active tab of front window'`
+        ).toString().trim();
+    }
+    console.log(getChromeURL())
+    const process = exec(command);
+    browserProcesses[browser] = process.pid;
+    console.log(browserProcesses)
+    res.send(`${browser} started successfully`);
+});
+
+app.get("/geturl", (req, res) => {
+    const { browser } = req.query;
+
+    try {
+        let url;
+        if (browser === "chrome") {
+            url = execSync(`osascript -e 'tell application "Google Chrome" to return URL of active tab of front window'`).toString().trim();
+        } else if (browser === "firefox") {
+            url = execSync(`
+                osascript -e '
+                    tell application "Firefox"
+                        get URL of active tab of window 1
+                    end tell'
+            `).toString().trim();
+        } else {
+            return res.status(400).json({ error: "Unsupported browser" });
+        }
+
+
+
+        res.json({ url });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to retrieve URL" });
+    }
+});
+
+
+app.get("/stop", (req, res) => {
+    const { browser } = req.query;
+    if (!browser) return res.status(400).send("Browser is required");
+
+    let command;
+    if (browser === "chrome") {
+        command = 'pkill -f "Google Chrome"';
+    } else if (browser === "firefox") {
+        command = 'pkill -f "Firefox"';
+    } else {
+        return res.status(400).send("Invalid browser");
+    }
+    // url = execSync(
+    //     `osascript -e 'tell application "Google Chrome" to get URL of active tab of front window'`
+    // ).toString().trim();
+    // console.log(url)
+    exec(command);
+    res.send(`${browser} stopped successfully`);
+});
+
+//warning this has deleted my chrome data 
+app.get("/cleanup", (req, res) => {
+    const { browser } = req.query;
+    if (!browser) return res.status(400).send("Browser is required");
+
+    let cleanupCommand;
+    if (browser === "chrome") {
+        cleanupCommand = `
+            rm -rf ~/Library/Application\\ Support/Google/Chrome/Default &&
+            rm -f ~/Library/Application\\ Support/Google/Chrome/Default/History &&
+            rm -f ~/Library/Application\\ Support/Google/Chrome/Default/History-journal
+        `;
+    } else if (browser === "firefox") {
+        cleanupCommand = `
+            rm -rf ~/Library/Application\\ Support/Firefox/Profiles
+        `;
+    } else {
+        return res.status(400).send("Invalid browser");
+    }
+
+    exec(cleanupCommand);
+    res.send(`${browser} data cleaned up`);
+});
+
+
+app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});

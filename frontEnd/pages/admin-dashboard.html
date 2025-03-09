@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocScan Admin - Document Scanning System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    :root {
+      --sidebar-bg: #f5f5f7;
+      --main-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #777777;
+      --border-color: #e0e0e0;
+      --accent-color: #000000;
+      --hover-bg: #eaeaea;
+      --success-color: #000000;
+      --warning-color: #000000;
+      --danger-color: #000000;
+    }
+    
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+    
+    .sidebar {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      padding: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    
+    .app-title {
+      display: flex;
+      align-items: center;
+      padding: 0 16px 20px;
+      font-weight: 600;
+    }
+    
+    .app-icon {
+      width: 24px;
+      height: 24px;
+      background-color: var(--accent-color);
+      border-radius: 6px;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    
+    .toggle {
+      width: 32px;
+      height: 18px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      margin-left: auto;
+      position: relative;
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background-color: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 10px;
+      width: 90%;
+      margin: 0 auto;
+      margin-top: 2px;
+    }
+    
+    .nav-item:hover {
+      background-color: var(--hover-bg);
+    }
+    
+    .nav-item.active {
+      background-color: var(--hover-bg);
+    }
+    
+    .nav-icon {
+      color: var(--text-secondary);
+      margin-right: 10px;
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .section-header {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 16px 16px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .main-content {
+      flex: 1;
+      background-color: var(--main-bg);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 16px 0 24px;
+    }
+    
+    .admin-badge {
+      display: inline-block;
+      background-color: #000;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background-color: var(--main-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .stat-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .stat-footer {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .tab {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .tab.active {
+      font-weight: 500;
+    }
+    
+    .tab.active:after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent-color);
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 24px 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-left: auto;
+    }
+    
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+    
+    .search-input {
+      padding: 8px 8px 8px 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      outline: none;
+      font-size: 14px;
+      width: 200px;
+    }
+    
+    .credit-requests {
+      margin-bottom: 24px;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .request-card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background-color: #fff;
+    }
+    
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-weight: 500;
+    }
+    
+    .user-name {
+      font-weight: 500;
+    }
+    
+    .user-email {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .request-date {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .request-details {
+      margin-bottom: 12px;
+    }
+    
+    .request-amount {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    
+    .request-reason {
+      font-size: 14px;
+      margin: 8px 0;
+      color: var(--text-secondary);
+    }
+    
+    .request-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-approve {
+      background-color: #000;
+      color: #fff;
+    }
+    
+    .btn-deny {
+      background-color: #fff;
+      border: 1px solid var(--border-color);
+    }
+    
+    .user-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .user-list th {
+      text-align: left;
+      padding: 12px 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: normal;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .user-list td {
+      padding: 12px 8px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-badge.active {
+      background-color: rgba(52, 199, 89, 0.1);
+      color: var(--success-color);
+    }
+    
+    .status-badge.inactive {
+      background-color: rgba(255, 59, 48, 0.1);
+      color: var(--danger-color);
+    }
+    
+    .text-right {
+      text-align: right;
+    }
+    
+    .chart-container {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    .chart {
+      height: 200px;
+      width: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding: 16px;
+      padding-top: 50px;
+    }
+    
+    .chart-bar {
+      flex: 1;
+      background-color: var(--accent-color);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+    
+    .chart-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    .chart-value {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+      gap: 8px;
+    }
+    
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      background-color: var(--main-bg);
+      cursor: pointer;
+    }
+    
+    .page-btn.active {
+      background-color: var(--hover-bg);
+      font-weight: 500;
+    }
+    
+    .icon-nav {
+      width: 20px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: var(--main-bg);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .btn-cancel {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background-color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .btn-submit {
+      padding: 8px 16px;
+      border: none;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    .document-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .document-list th {
+      text-align: left;
+      padding: 12px 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: normal;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .document-list td {
+      padding: 12px 8px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="app-title">
+      <div class="app-icon">DS</div>
+      DocScan <span class="admin-badge">Admin</span>
+      <div class="toggle"></div>
+    </div>
+    
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">📊</span>
+      Admin Dashboard
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👥</span>
+      User Management
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🔄</span>
+      Credit Requests
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📈</span>
+      System Analytics
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📝</span>
+      Document Database
+    </a>
+    
+    <div class="section-header">SYSTEM</div>
+    
+    <a href="#" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🔒</span>
+      Permissions
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📊</span>
+      Logs
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🚨</span>
+      System Health
+    </a>
+  </aside>
+  
+  <main class="main-content">
+    <div style="display: flex; width: 100%; justify-content: space-between;">
+      <h1 class="page-title">Admin Dashboard</h1>
+      <h1 class="page-title"><img style="width: 30px; cursor: pointer;" id="logout-button" src="../icons/logout.png" /></h1>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Total Users</div>
+        <div class="stat-value">128</div>
+        <div class="stat-footer">+12 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Credit Requests</div>
+        <div class="stat-value">7</div>
+        <div class="stat-footer">2 new today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Total Documents</div>
+        <div class="stat-value">2,147</div>
+        <div class="stat-footer">+89 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Credits Issued</div>
+        <div class="stat-value">546</div>
+        <div class="stat-footer">Last 30 days</div>
+      </div>
+    </div>
+    
+
+    
+    <div class="two-column">
+      <div class="credit-requests">
+        <div class="section-title">
+          Pending Credit Requests
+          <button class="btn btn-approve" style="font-size: 12px; padding: 6px 12px;">View All</button>
+        </div>
+        
+        <div class="request-card">
+          <div class="request-header">
+            <div class="user-info">
+              <div class="user-avatar">JD</div>
+              <div>
+                <div class="user-name">John Doe</div>
+                <div class="user-email">john.doe@example.com</div>
+              </div>
+            </div>
+            <div class="request-date">3 hours ago</div>
+          </div>
+          <div class="request-details">
+            <span class="request-amount">Requested: 50 credits</span>
+            <div class="request-reason">"Need extra credits for a large batch of documents that must be processed today for a client presentation."</div>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn-approve">Approve</button>
+            <button class="btn btn-deny">Deny</button>
+          </div>
+        </div>
+        
+        <div class="request-card">
+          <div class="request-header">
+            <div class="user-info">
+              <div class="user-avatar">AS</div>
+              <div>
+                <div class="user-name">Alice Smith</div>
+                <div class="user-email">alice.smith@example.com</div>
+              </div>
+            </div>
+            <div class="request-date">5 hours ago</div>
+          </div>
+          <div class="request-details">
+            <span class="request-amount">Requested: 25 credits</span>
+            <div class="request-reason">"Working on an urgent project that requires additional document scans."</div>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn-approve">Approve</button>
+            <button class="btn btn-deny">Deny</button>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <div class="section-title">
+          Top Users (By Scan Count)
+        </div>
+        
+        <table class="user-list">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Scans Today</th>
+              <th>Total Scans</th>
+              <th>Credits Left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar" style="width: 24px; height: 24px; font-size: 10px;">JD</div>
+                  <div style="margin-left: 8px;">John Doe</div>
+                </div>
+              </td>
+              <td>18</td>
+              <td>142</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar" style="width: 24px; height: 24px; font-size: 10px;">AS</div>
+                  <div style="margin-left: 8px;">Alice Smith</div>
+                </div>
+              </td>
+              <td>15</td>
+              <td>98</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar" style="width: 24px; height: 24px; font-size: 10px;">RJ</div>
+                  <div style="margin-left: 8px;">Robert Johnson</div>
+                </div>
+              </td>
+              <td>12</td>
+              <td>87</td>
+              <td>8</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar" style="width: 24px; height: 24px; font-size: 10px;">EW</div>
+                  <div style="margin-left: 8px;">Emma Wilson</div>
+                </div>
+              </td>
+              <td>9</td>
+              <td>65</td>
+              <td>11</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div>
+      <div class="section-title">
+        Recent Document Matches
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="Search documents">
+        </div>
+      </div>
+      
+      <table class="document-list">
+        <thead>
+          <tr>
+            <th>Document</th>
+            <th>Uploaded By</th>
+            <th>Date</th>
+            <th>Match Count</th>
+            <th>Match Rate</th>
+            <th width="80">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="font-weight: 500;">Project Proposal Final.txt</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">128 KB</div>
+            </td>
+            <td>John Doe</td>
+            <td>Today, 10:45 AM</td>
+            <td>3 matches</td>
+            <td>94%</td>
+            <td>
+              <button class="btn" style="padding: 4px 8px; font-size: 12px;">View</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-weight: 500;">Contract_v2.txt</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">96 KB</div>
+            </td>
+            <td>Alice Smith</td>
+            <td>Today, 9:12 AM</td>
+            <td>5 matches</td>
+            <td>87%</td>
+            <td>
+              <button class="btn" style="padding: 4px 8px; font-size: 12px;">View</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-weight: 500;">Financial_Report_Q1.txt</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">215 KB</div>
+            </td>
+            <td>Robert Johnson</td>
+            <td>Yesterday, 4:30 PM</td>
+            <td>2 matches</td>
+            <td>76%</td>
+            <td>
+              <button class="btn" style="padding: 4px 8px; font-size: 12px;">View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add User Modal -->
+  <div class="modal" id="addUserModal">
+    <div class="modal-content">
+      <h2 class="modal-title">Add New User</h2>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" placeholder="Enter user's full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="Enter user's email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Initial Credits</label>
+        <input type="number" class="form-input" min="0" value="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">User Role</label>
+        <select class="form-input">
+          <option>Regular User</option>
+          <option>Admin</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" id="cancelAddUser">Cancel</button>
+        <button class="btn-submit">Add User</button>
+      </div>
+    </div>
+  </div>
+<script type="module" src="../js/adminDashboard.js" ></script>
+  <script>
+    // JavaScript would go here for functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Example JavaScript to show modal
+      document.getElementById('addUserBtn')?.addEventListener('click', function() {
+        document.getElementById('addUserModal').style.display = 'flex';
+      });
+      
+      document.getElementById('cancelAddUser')?.addEventListener('click', function() {
+        document.getElementById('addUserModal').style.display = 'none';
+      });
+      
+      // Toggle sidebar functionality would go here
+      
+      // Credit request approval/denial functionality would go here
+    });
+  </script>
+</body>
+</html>
