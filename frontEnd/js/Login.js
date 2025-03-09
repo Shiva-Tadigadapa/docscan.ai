@@ -1,7 +1,7 @@
 
 import AuthContext from './authContext.js';
 import { checkAuthStatus } from './routeGuard.js';
-const API_URL = "http://localhost:3000/api/auth";
+const API_URL = "https://docscan-ai.onrender.com/api/auth";
 
 
 checkAuthStatus();
