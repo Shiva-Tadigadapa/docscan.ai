@@ -205,9 +205,60 @@
         padding: 0 5%;
       }
     }
+    
+    /* Server loading overlay styles */
+    #server-loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .server-status-message {
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+      max-width: 80%;
+    }
+    
+    .server-status-submessage {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
+  <!-- Server loading overlay -->
+  <div id="server-loading-overlay">
+    <div class="spinner"></div>
+    <div class="server-status-message">Starting up the server...</div>
+    <div class="server-status-submessage">This may take a minute as the server wakes up from sleep mode. this may take more then 60sec</div>
+  </div>
+
   <div class="container">
     <div class="image-side">
       <!-- Image background handled by CSS -->

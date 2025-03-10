@@ -2,9 +2,75 @@ import AuthContext from './authContext.js';
 import { checkAuthStatus } from './routeGuard.js';
 const API_URL = "https://docscan-ai.onrender.com/api/auth";
 
+// Add server status check
+let serverReady = false;
+
+// Function to check if server is ready
+async function checkServerStatus() {
+  try {
+    const response = await fetch('https://docscan-ai.onrender.com/ ', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.log('Server not ready yet:', error);
+    return false;
+  }
+}
+
+// Function to show server loading overlay
+function showServerLoading() {
+  const overlay = document.getElementById('server-loading-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+  }
+}
+
+// Function to hide server loading overlay
+function hideServerLoading() {
+  const overlay = document.getElementById('server-loading-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
+}
+
+// Initialize server check
+async function initServerCheck() {
+  showServerLoading();
+  
+  // Try to connect to server
+  serverReady = await checkServerStatus();
+  
+  if (serverReady) {
+    hideServerLoading();
+  } else {
+    // If server not ready, start polling
+    const statusInterval = setInterval(async () => {
+      serverReady = await checkServerStatus();
+      
+      if (serverReady) {
+        hideServerLoading();
+        clearInterval(statusInterval);
+      }
+    }, 3000); // Check every 3 seconds
+  }
+}
+
+// Start server check when page loads
+document.addEventListener('DOMContentLoaded', initServerCheck);
+
 checkAuthStatus();
 async function loginUser(email, password) {
     try {
+      // Check if server is ready
+      if (!serverReady) {
+        throw new Error('Server is still starting up. Please wait a moment and try again.');
+      }
+      
       // Show loading state on button
       const loginButton = document.querySelector('#login-form button[type="submit"]');
       if (loginButton) {
@@ -52,7 +118,7 @@ async function loginUser(email, password) {
       const loginButton = document.querySelector('#login-form button[type="submit"]');
       if (loginButton) {
         loginButton.disabled = false;
-        loginButton.textContent = 'Login';
+        loginButton.textContent = 'Sign In';
       }
     }
 }

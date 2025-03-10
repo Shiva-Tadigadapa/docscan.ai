@@ -23,7 +23,7 @@ export async function protectAdminRoute() {
   // Check if user is authenticated and is an admin
   if (!AuthContext.isAuthenticated() || AuthContext.getUserRole() !== 'admin') {
     // Redirect to login or unauthorized page
-    window.location.href = '/login.html';
+    window.location.href = '/index.html';
     return false;
   }
   
@@ -45,7 +45,7 @@ export function checkAuthStatus() {
   if (publicPages.includes(currentPath) && AuthContext.isAuthenticated()) {
     const userRole = AuthContext.getUserRole();
     window.location.href = userRole === 'admin' 
-      ? '/pages/dashboard.html' 
+      ? '/pages/admin-dashboard.html' 
       : '/pages/dashboard.html';
     return false;
   }

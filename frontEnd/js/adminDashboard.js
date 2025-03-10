@@ -308,7 +308,7 @@ function setupEventListeners() {
     // Logout button
     document.getElementById('logout-button')?.addEventListener('click', function() {
         localStorage.removeItem('token');
-        window.location.href = '/pages/login.html';
+        window.location.href = '/';
     });
     
     // View all credit requests button
