@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/auth/logout', {
+        const response = await fetch('https://docscan-ai.onrender.com/api/auth/logout', {
           method: 'POST',
           credentials: 'include'
         });
@@ -109,7 +109,7 @@ function submitCreditRequest() {
         submitBtn.textContent = 'Submitting...';
         
         // Send request to API
-        fetch('http://localhost:3000/api/credits/request', {
+        fetch('https://docscan-ai.onrender.com/api/credits/request', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ function checkCreditReset() {
         const userContext = JSON.parse(userContextStr);
         const token = userContext.accessToken;
         
-        fetch('http://localhost:3000/api/credits/reset/check-reset', {
+        fetch('https://docscan-ai.onrender.com/api/credits/reset/check-reset', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(formData.fileName)
   
     // Send file to backend
-    fetch('http://localhost:3000/api/scan', {  // Update with your backend URL
+    fetch('https://docscan-ai.onrender.com/api/scan', {  // Update with your backend URL
       method: 'POST',
       body: formData,
       credentials: 'include',  // Include if you're using cookies
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchAndDisplayDocuments() {
   const userId = AuthContext.getUser().id;
   try {
-    const response = await fetch(`http://localhost:3000/api/documents/${userId}`, {
+    const response = await fetch(`https://docscan-ai.onrender.com/api/documents/${userId}`, {
       method: 'GET',
       credentials: 'include',
       headers: {

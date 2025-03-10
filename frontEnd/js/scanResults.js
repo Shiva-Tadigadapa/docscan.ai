@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // Make API call to backend
-        const response = await fetch(`http://localhost:3000/api/matches/${docId}`, {
+        const response = await fetch(`https://docscan-ai.onrender.com/api/matches/${docId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const progressPromise = simulateAnalysisProgress();
 
                         // Make API call
-                        const apiPromise = fetch(`http://localhost:3000/api/scan/ai/${docId}`, {
+                        const apiPromise = fetch(`https://docscan-ai.onrender.com/api/scan/ai/${docId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -687,7 +687,7 @@ async function fetchAndDisplayComparison(originalDocId, compareId) {
         comparisonContainer.style.display = 'block';
 
         // Make API call to get comparison data
-        const response = await fetch(`http://localhost:3000/api/ai/compare/${originalDocId}/${compareId}`, {
+        const response = await fetch(`https://docscan-ai.onrender.com/api/ai/compare/${originalDocId}/${compareId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

@@ -34,7 +34,7 @@ class AuthContext {
       
       // Use JSON.stringify directly, not as a property of this.user
       // alert(JSON.stringify(this.user));
-      
+
       console.log("User data saved:", this.user); // Debug
 
       sessionStorage.setItem('userContext', JSON.stringify(this.user));
@@ -65,7 +65,7 @@ class AuthContext {
       if (!this.user || !this.user.accessToken) return;
       
       try {
-        const response = await fetch('http://localhost:3000/api/auth/verify', {
+        const response = await fetch('https://docscan-ai.onrender.com/api/auth/verify', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.user.accessToken}`

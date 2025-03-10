@@ -32,7 +32,7 @@ function checkAdminAuth() {
         }
         
         // Verify admin status
-        fetch('http://localhost:3000/api/admin/verify', {
+        fetch('https://docscan-ai.onrender.com/api/admin/verify', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -57,7 +57,7 @@ function checkAdminAuth() {
 function loadDashboardData() {
     const token = localStorage.getItem('token');
     
-    fetch('http://localhost:3000/api/dashboard/stats', {
+    fetch('https://docscan-ai.onrender.com/api/dashboard/stats', {
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -252,7 +252,7 @@ function handleCreditRequestAction(e) {
     const userContext = JSON.parse(userContextStr);
     const token = userContext.accessToken;
     
-    fetch('http://localhost:3000/api/credits/admin/process', {
+    fetch('https://docscan-ai.onrender.com/api/credits/admin/process', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
