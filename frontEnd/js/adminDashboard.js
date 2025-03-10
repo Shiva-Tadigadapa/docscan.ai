@@ -307,7 +307,7 @@ function viewDocument(e) {
 function setupEventListeners() {
     // Logout button
     document.getElementById('logout-button')?.addEventListener('click', function() {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('userContext');
         window.location.href = '/';
     });
     
